@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GITHUB ROASTER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo+Black&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --red: #ff0000;
+            --gray: #cccccc;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: var(--white);
+            color: var(--black);
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: clamp(3rem, 10vw, 7rem);
+            letter-spacing: -0.05em;
+            line-height: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            border: 8px solid var(--black);
+            padding: 30px;
+            background: var(--black);
+            color: var(--white);
+            transform: rotate(-1deg);
+            box-shadow: 12px 12px 0 var(--red);
+        }
+
+        .subtitle {
+            font-size: 18px;
+            margin-bottom: 60px;
+            border-left: 4px solid var(--black);
+            padding-left: 20px;
+            margin-top: 40px;
+        }
+
+        .input-section {
+            margin-bottom: 60px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            border: 4px solid var(--black);
+            background: var(--white);
+        }
+
+        input {
+            width: 100%;
+            padding: 24px;
+            font-family: 'Space Mono', monospace;
+            font-size: 18px;
+            border: none;
+            outline: none;
+            background: transparent;
+        }
+
+        button {
+            width: 100%;
+            padding: 24px;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 24px;
+            text-transform: uppercase;
+            background: var(--black);
+            color: var(--white);
+            border: 4px solid var(--black);
+            cursor: pointer;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: var(--red);
+            border-color: var(--red);
+            transform: translate(-4px, -4px);
+            box-shadow: 4px 4px 0 var(--black);
+        }
+
+        button:active {
+            transform: translate(0, 0);
+            box-shadow: none;
+        }
+
+        button:disabled {
+            background: var(--gray);
+            border-color: var(--gray);
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            font-size: 24px;
+            border: 4px solid var(--black);
+            background: repeating-linear-gradient(
+                45deg,
+                var(--white),
+                var(--white) 10px,
+                var(--gray) 10px,
+                var(--gray) 20px
+            );
+            animation: loading-pulse 2s infinite;
+        }
+
+        @keyframes loading-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .result {
+            display: none;
+        }
+
+        .user-card {
+            border: 6px solid var(--black);
+            padding: 30px;
+            margin-bottom: 40px;
+            background: var(--white);
+            position: relative;
+        }
+
+        .user-header {
+            display: flex;
+            gap: 30px;
+            align-items: start;
+            margin-bottom: 30px;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border: 4px solid var(--black);
+            flex-shrink: 0;
+        }
+
+        .user-info h2 {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat {
+            border: 3px solid var(--black);
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .repos-list {
+            margin-top: 20px;
+            border-top: 3px solid var(--black);
+            padding-top: 20px;
+        }
+
+        .repo-item {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .roast-box {
+            border: 6px solid var(--red);
+            padding: 40px;
+            background: var(--black);
+            color: var(--white);
+            position: relative;
+            margin-top: 40px;
+        }
+
+        .roast-label {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 24px;
+            color: var(--red);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .roast-text {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .error {
+            border: 4px solid var(--red);
+            padding: 30px;
+            background: var(--red);
+            color: var(--white);
+            margin-top: 20px;
+            font-weight: 700;
+        }
+
+        .reset-btn {
+            margin-top: 40px;
+            background: var(--white);
+            color: var(--black);
+            border-color: var(--black);
+        }
+
+        .reset-btn:hover {
+            background: var(--gray);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+                padding: 20px;
+            }
+
+            .user-header {
+                flex-direction: column;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GITHUB<br>ROASTER</h1>
+        <p class="subtitle">BRUTAL HONEST FEEDBACK ON YOUR GITHUB PROFILE. NO MERCY.</p>
+
+        <div class="input-section">
+            <div class="input-wrapper">
+                <input type="text" id="githubUrl" placeholder="https://github.com/username" />
+            </div>
+            <button id="roastBtn">ROAST THIS PROFILE</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div>ANALYZING PROFILE...</div>
+            <div>PREPARING ROAST...</div>
+        </div>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const urlInput = document.getElementById('githubUrl');
+        const roastBtn = document.getElementById('roastBtn');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+
+        roastBtn.addEventListener('click', async () => {
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                alert('Please enter a GitHub URL');
+                return;
+            }
+
+            roastBtn.disabled = true;
+            loading.style.display = 'block';
+            result.style.display = 'none';
+
+            try {
+                const response = await fetch('/roast', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to roast profile');
+                }
+
+                displayResult(data);
+            } catch (error) {
+                result.innerHTML = `<div class="error">ERROR: ${error.message}</div>`;
+                result.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+                roastBtn.disabled = false;
+            }
+        });
+
+        function displayResult(data) {
+            const { user, roast } = data;
+            
+            result.innerHTML = `
+                <div class="user-card">
+                    <div class="user-header">
+                        <img src="${user.avatar}" alt="${user.username}" class="avatar">
+                        <div class="user-info">
+                            <h2>${user.username}</h2>
+                            <p>${user.bio}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="stat-value">${user.repos}</span>
+                            <span class="stat-label">Repos</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">${user.followers}</span>
+                            <span class="stat-label">Followers</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">${user.following}</span>
+                            <span class="stat-label">Following</span>
+                        </div>
+                    </div>
+                    
+                    <div class="repos-list">
+                        <strong>TOP REPOS:</strong>
+                        ${user.top_repos.map(repo => `<div class="repo-item">${repo}</div>`).join('')}
+                    </div>
+                </div>
+
+                <div class="roast-box">
+                    <div class="roast-label">🔥 THE ROAST 🔥</div>
+                    <div class="roast-text">${roast}</div>
+                </div>
+
+                <button class="reset-btn" onclick="location.reload()">ROAST ANOTHER</button>
+            `;
+            
+            result.style.display = 'block';
+        }
+
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                roastBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
