@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 from flask import Flask, render_template, request, jsonify
-import requests
 import os
 from github import Github, Auth
 from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 load_dotenv()
-
 app = Flask(__name__)
 
 def get_gh(user):
@@ -18,7 +19,7 @@ def get_gh(user):
         auth = Auth.Token(token)
         g = Github(auth=auth)
         u = g.get_user(user)
-        repos = list(u.get_repos()[:5])
+        repos = list(u.get_repos()[:7])
         
         info = f"{user} | Repos: {u.public_repos} | Followers: {u.followers} | Bio: {u.bio or 'None'}\n"
         info += "Top Repos: "
@@ -47,10 +48,34 @@ def get_gh(user):
 
 def roast(txt):
     try:
-     data = {"model": "llama3.2:latest", "prompt": f"Roast this GitHub profile brutally in one paragraph:\n\n{txt}", "stream": False}
-     return requests.post("http://localhost:11434/api/generate", json=data).json()['response']
+        api_key = os.getenv('GEMINI_API_KEY')
+        if not api_key:
+            return "❌ GOOGLE_API_KEY not found in .env file"
+        
+        # Initialize Gemini LLM
+        llm = ChatGoogleGenerativeAI(
+            model="gemini-2.5-flash",
+            google_api_key=api_key,
+            temperature=0.9
+        )
+        
+        # Create prompt template
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are a brutal, savage code reviewer and GitHub profile roaster. 
+Your job is to analyze GitHub profiles and roast them mercilessly.
+Be absolutely ruthless. Keep it ONE PARAGRAPH. Make it hurt."""),
+            ("user", "Roast this GitHub profile:\n\n{profile_data}")
+        ])
+        
+        # Create chain
+        chain = prompt | llm | StrOutputParser()
+        
+        # Execute
+        result = chain.invoke({"profile_data": txt})
+        return result
+        
     except Exception as e:
-     return f"Error generating roast: {str(e)}"
+        return f"❌ Error: {str(e)}"
 
 @app.route('/')
 def index():
